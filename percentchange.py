@@ -98,12 +98,11 @@ def main():
 
 	# find min and max
 	lowvalVBM, lowtimeVBM, lowamountVBM, highvalVBM, hightimeVBM, highamountVBM = minmax(average, 'volatilityByMin')
+	lowvalVMO, lowtimeVMO, lowamountVMO, highvalVMO, hightimeVMO, highamountVMO = minmax(average, 'volatilityVsMktOpen')
 
-
-	
 	print('%s: Volatility by min (Last %s days) - Highest: $%.2f @ +%.4f%% (%s) | Lowest: $%.2f @ %.4f%% (%s) ' % (str(ticker.upper()), day, highamountVBM, highvalVBM, str(hightimeVBM.strftime("%I:%M%p")), lowamountVBM, lowvalVBM, str(lowtimeVBM.strftime("%I:%M%p"))))
 
-
+	print('%s: Volatility by min vs market open(Last %s days) - Highest: $%.2f @ +%.4f%% (%s) | Lowest: $%.2f @ %.4f%% (%s) ' % (str(ticker.upper()), day, highamountVMO, highvalVMO, str(hightimeVMO.strftime("%I:%M%p")), lowamountVMO, lowvalVMO, str(lowtimeVMO.strftime("%I:%M%p"))))
 
 
 
