@@ -23,16 +23,16 @@ def main():
 
 	# scrape data and write to a file
 	data = scrape('https://www.google.com/finance/getprices?q=' + str(ticker.upper()) + '&x=' + str(market.upper()) + '&i=60&p=30d&f=d,c,h,l,o,v')
-	f = open('datatest', 'w')
+	f = open('./data/' + ticker, 'w')
 	f.write(data)
 	f.close()
 
 	# remove lines 1-7 and the last line, then override file
-	lines = open('datatest').readlines()
-	newfile = open('datatest','w').writelines(lines[7:-1])
+	lines = open('./data/' + ticker).readlines()
+	newfile = open('./data/' + ticker,'w').writelines(lines[7:-1])
 
 	# open new file and use data
-	data = open('datatest').readlines()
+	data = open('./data/' + ticker).readlines()
 
 	# create dictionary for data storage && store data / calculate pct change per min per day
 	intraday = {}
