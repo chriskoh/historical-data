@@ -18,7 +18,7 @@ def temp(ticker, market):
 
         # scrape data and write to a temp file
         data = scrape('https://www.google.com/finance/getprices?q=' + str(ticker.upper()) + '&x=' + str(market.upper()) + '&i=60&p=30d&f=d,c,h,l,o,v')
-        f = open('./data/temp', 'w')
+        f = open('/intradata/temp', 'w')
         f.write(data)
         f.close()
 

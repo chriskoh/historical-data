@@ -3,34 +3,42 @@
 import sys
 import os
 import datetime
+import cgi
+import cgitb
+import requests
+from bs4 import BeautifulSoup, NavigableString
 from intradaytools import *
 
 
 def main():
 
-	os.system('clear')
+	form = cgi.FieldStorage()
 
 	# Get ticker from user
-	ticker = input('Enter Ticker: ')
-	market = input('Choose Market (NYSE || NASD): ')
+	ticker = form.getvalue('ticker')
+	market = form.getvalue('market')
+#	ticker = input('ticker')
+#	market = input('market')
+	ticker = ticker.upper()
+	market = market.upper()
 
 	# get intraday information for the last 15 days, save to temp file
 	temp(ticker, market)
 
 	# open tempfile, save lines, delete temp file.
-	templines = open('./data/temp').readlines()
-	os.remove('./data/temp')
+	templines = open('/intradata/temp').readlines()
+	os.remove('/intradata/temp')
 
 	# check for exsisting data files
-	filecheck = os.path.isfile('./data/' + ticker)
+	filecheck = os.path.isfile('/intradata/' + ticker)
 
 	# create new ticker data file if one does not exist or add new lines lines to existing files
 	if filecheck == False:
-		newfile = open('./data/' + ticker,'w').writelines(templines[7:-1])
+		newfile = open('/intradata/' + ticker,'w').writelines(templines[7:-1])
 	else:
 		# parse exsiting data files, and new temp data files
 		tempfile, tempdays = parsefile(templines)
-		existinglines = open('./data/' + ticker).readlines()
+		existinglines = open('/intradata/' + ticker).readlines()
 		existingfile, existingdays = parsefile(existinglines)	
 
 		# merge files, get data older than 15 days from existing file & get data within current 15 days from temp file
@@ -41,19 +49,19 @@ def main():
 				pass
 			else:
 				# older data no longer in the last 15 days - append from existing data (existingfile)
-				mergedfile += str(tempfile[str(tempdays[x]) + 'data'])
+				mergedfile += str(existingfile[str(existingdays[x]) + 'data'])
 
 		# append all new data (will override old similar data, and keep current day up todate)
 		for x in range(len(tempdays)):
 			mergedfile += str(tempfile[str(tempdays[x]) + 'data'])
 
 		# overide exsiting file with new data
-		override = open('./data/' + ticker, 'w')
+		override = open('/intradata/' + ticker, 'w')
 		override.write(mergedfile)
 		override.close()
 
 	# open ticker data file and use data
-	data = open('./data/' + ticker).readlines()
+	data = open('/intradata/' + ticker).readlines()
 
 	# create dictionary for data storage && store data / run calculations for each min (390 mins per day) 
 	intraday = {}
@@ -100,10 +108,20 @@ def main():
 	lowvalVBM, lowtimeVBM, lowamountVBM, highvalVBM, hightimeVBM, highamountVBM = minmax(average, 'volatilityByMin')
 	lowvalVMO, lowtimeVMO, lowamountVMO, highvalVMO, hightimeVMO, highamountVMO = minmax(average, 'volatilityVsMktOpen')
 
-	print('%s: Volatility by min (Last %s days) - Highest: $%.2f @ +%.4f%% (%s) | Lowest: $%.2f @ %.4f%% (%s) ' % (str(ticker.upper()), day, highamountVBM, highvalVBM, str(hightimeVBM.strftime("%I:%M%p")), lowamountVBM, lowvalVBM, str(lowtimeVBM.strftime("%I:%M%p"))))
+	print("Content-type: text/html")
+	print()
+	print("<?xml version=\"1.0\" encoding=\"UTF-8\"?>")
+	print("<!DOCTYPE html>")
+	print("<html>")
+	print("<head>")
+	print("<title>Intraday Stock Data: %s</title>" % (ticker))
+	print("<body>")
+	print("<h1>Intraday Stock Data: %s</h1>" % (ticker))
+	print('<p>Volatility by min (Last %s days) - Highest: $%.2f @ +%.4f%% (%s) | Lowest: $%.2f @ %.4f%% (%s)</p>' % (day, highamountVBM, highvalVBM, str(hightimeVBM.strftime("%I:%M%p")), lowamountVBM, lowvalVBM, str(lowtimeVBM.strftime("%I:%M%p"))))
 
-	print('%s: Volatility by min vs market open(Last %s days) - Highest: $%.2f @ +%.4f%% (%s) | Lowest: $%.2f @ %.4f%% (%s) ' % (str(ticker.upper()), day, highamountVMO, highvalVMO, str(hightimeVMO.strftime("%I:%M%p")), lowamountVMO, lowvalVMO, str(lowtimeVMO.strftime("%I:%M%p"))))
-
+	print('<p>Volatility by min vs market open(Last %s days) - Highest: $%.2f @ +%.4f%% (%s) | Lowest: $%.2f @ %.4f%% (%s)</p>' % (day, highamountVMO, highvalVMO, str(hightimeVMO.strftime("%I:%M%p")), lowamountVMO, lowvalVMO, str(lowtimeVMO.strftime("%I:%M%p"))))
+	print("</body>")
+	print("</html>")
 
 
 
