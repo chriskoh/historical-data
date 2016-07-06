@@ -11,16 +11,27 @@ def scrape(website):
         cal_data = cal_resp.text
         data = BeautifulSoup(cal_data, 'lxml')
 
-        return str(data)
-
+        return data
 
 def temp(ticker, market):
 
         # scrape data and write to a temp file
         data = scrape('https://www.google.com/finance/getprices?q=' + str(ticker.upper()) + '&x=' + str(market.upper()) + '&i=60&p=30d&f=d,c,h,l,o,v')
+        data = str(data)
         f = open('/intradata/temp', 'w')
         f.write(data)
         f.close()
+
+def findmarket(ticker):
+	
+	data = scrape('https://www.google.com/finance?q=' + ticker)
+	title = str(data.title)
+	if 'NASDAQ' in title:
+		return 'NASD'
+		print('nasdaq')
+	else:
+		return 'NYSE'
+		print('nyse')
 
 def parsefile(lines):
 

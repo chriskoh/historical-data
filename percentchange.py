@@ -14,11 +14,11 @@ def main():
 
 	form = cgi.FieldStorage()
 
-	# Get ticker from user
+	# Get ticker from user / find market based on ticker
 	ticker = form.getvalue('ticker')
-	market = form.getvalue('market')
 #	ticker = input('ticker')
-#	market = input('market')
+	market = findmarket(ticker)
+
 	ticker = ticker.upper()
 	market = market.upper()
 
