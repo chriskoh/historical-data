@@ -28,10 +28,8 @@ def findmarket(ticker):
 	title = str(data.title)
 	if 'NASDAQ' in title:
 		return 'NASD'
-		print('nasdaq')
 	else:
 		return 'NYSE'
-		print('nyse')
 
 def parsefile(lines):
 
@@ -54,7 +52,6 @@ def parsefile(lines):
 				tempfile[str(currentday) + 'data'] += str(lines[x])
 
 	return tempfile, days
-
 
 def minmax(dictionary, dataset):
 
