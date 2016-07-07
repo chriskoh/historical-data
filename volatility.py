@@ -1,14 +1,11 @@
 #!/usr/bin/env python3
+# volatility.py
+# volatility calculations for intraday stock analysis 
 
-import sys
-import os
-import datetime
 import cgi
 import cgitb
-import requests
-from bs4 import BeautifulSoup, NavigableString
 from intradaytools import *
-
+from chart import *
 
 def main():
 
@@ -16,7 +13,6 @@ def main():
 
 	# Get ticker from user / find market based on ticker
 	ticker = form.getvalue('ticker')
-#	ticker = input('ticker')
 	market = findmarket(ticker)
 
 	ticker = ticker.upper()
@@ -105,8 +101,8 @@ def main():
 		average[str(x) + 'close'] /= int(day)
 
 	# find min and max
-	lowvalVBM, lowtimeVBM, lowamountVBM, highvalVBM, hightimeVBM, highamountVBM = minmax(average, 'volatilityByMin')
-	lowvalVMO, lowtimeVMO, lowamountVMO, highvalVMO, hightimeVMO, highamountVMO = minmax(average, 'volatilityVsMktOpen')
+	lowvalVBM, lowtimeVBM, lowamountVBM, highvalVBM, hightimeVBM, highamountVBM, allvalsVBM = minmax(average, 'volatilityByMin')
+	lowvalVMO, lowtimeVMO, lowamountVMO, highvalVMO, hightimeVMO, highamountVMO, allvalsVMO = minmax(average, 'volatilityVsMktOpen')
 
 	print("Content-type: text/html")
 	print()
@@ -114,12 +110,23 @@ def main():
 	print("<!DOCTYPE html>")
 	print("<html>")
 	print("<head>")
+	print("<script type='text/javascript'>")
+	print("window.onload = function () {")
+	createchart('Volatility by Minute', 'volByMin', allvalsVBM)
+	createchart('Volatility by Minute Vs. Market Open', 'volVsMktOpen', allvalsVMO)
+	print("}")
+	print("</script>")
+	print("<script type='text/javascript' src='http://canvasjs.com/assets/script/canvasjs.min.js'></script>")
 	print("<title>Intraday Stock Data: %s</title>" % (ticker))
+	print("</head>")
 	print("<body>")
 	print("<h1>Intraday Stock Data: %s</h1>" % (ticker))
-	print('<p>Volatility by min (Last %s days) - Highest: $%.2f @ +%.4f%% (%s) | Lowest: $%.2f @ %.4f%% (%s)</p>' % (day, highamountVBM, highvalVBM, str(hightimeVBM.strftime("%I:%M%p")), lowamountVBM, lowvalVBM, str(lowtimeVBM.strftime("%I:%M%p"))))
-
-	print('<p>Volatility by min vs market open(Last %s days) - Highest: $%.2f @ +%.4f%% (%s) | Lowest: $%.2f @ %.4f%% (%s)</p>' % (day, highamountVMO, highvalVMO, str(hightimeVMO.strftime("%I:%M%p")), lowamountVMO, lowvalVMO, str(lowtimeVMO.strftime("%I:%M%p"))))
+	displaychart('volByMin')
+	print('<p>Highest: $%.2f @ +%.4f%% (%s)</p>' % (highamountVBM, highvalVBM, str(hightimeVBM.strftime("%I:%M%p")))) 
+	print('<p>Lowest: $%.2f @ %.4f%% (%s)</p>' % (lowamountVBM, lowvalVBM, str(lowtimeVBM.strftime("%I:%M%p"))))
+	displaychart('volVsMktOpen')
+	print('<p>Highest: $%.2f @ +%.4f%% (%s)</p>' % (highamountVMO, highvalVMO, str(hightimeVMO.strftime("%I:%M%p"))))
+	print('<p>Lowest: $%.2f @ %.4f%% (%s)</p>' % (lowamountVMO, lowvalVMO, str(lowtimeVMO.strftime("%I:%M%p"))))
 	print("</body>")
 	print("</html>")
 
