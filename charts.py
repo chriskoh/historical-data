@@ -6,7 +6,7 @@ import cgi
 import cgitb
 cgitb.enable()
 
-def createchart(lname, name, values):
+def createLineGraph(lname, name, values):
 	
 	print('var ' + name + ' = new CanvasJS.Chart("' + name + 'Container",{')
 	print('	title:{')
@@ -26,15 +26,12 @@ def createchart(lname, name, values):
 	print('		dataPoints: [')
 	for x in range(len(values)):
 		print('		{ x: new Date(2016,0,1,6,30+' + str(x) + ',0,0), y: ' + str(values[x]) + ' },')
-#	print('		{ x: new Date(2016,0,1,6,30+0,0,0), y: 1 },')
-#	print('		{ x: new Date(2016,0,1,6,30+1,0,0), y: 2 },')
-#	print('		{ x: new Date(2016,0,1,6,30+2,0,0), y: 3 },')
 	print('		]')
 	print('	}]')
 	print('});')
 	print('' + name + '.render();')
 	print('' + name + ' = {};')
 	
-def displaychart(name):
+def displayLineGraph(name):
 	
 	print('<div id="' + name + 'Container" style="height: 300px; width: 100%;"></div>')

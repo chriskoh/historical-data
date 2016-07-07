@@ -5,7 +5,7 @@
 import cgi
 import cgitb
 from intradaytools import *
-from chart import *
+from charts import *
 
 def main():
 
@@ -74,7 +74,7 @@ def main():
 		intraday[str(day) + split[0] + 'close'] = float(split[1]) # split[1] = current min close $ value
 		intraday[str(day) + split[0] + 'vol'] = int(split[5]) # split[5] = current min volume # of shares
 
-		# formulas
+		# volatility formulas
 		intraday[str(day) + split[0] + 'volatilityByMin'] = ((float(split[1]) / float(split[4])) - int(1)) * int(100)
 		intraday[str(day) + split[0] + 'volatilityVsMktOpen'] = ((float(split[1]) / float(intraday[(str(day)) + '0' + 'open'])) - int(1)) * int(100)
 
@@ -83,7 +83,7 @@ def main():
 		average[split[0] + 'volatilityVsMktOpen'] = 0
 		average[split[0] + 'close'] = 0
 
-		# increment day counter any time current min == 390 (market close / end of current day)
+		# day counter.  If at any time current min == 390 mark one complete day
 		if int(split[0]) == int(390):
 			day += 1
 
@@ -100,7 +100,7 @@ def main():
 		average[str(x) + 'volatilityVsMktOpen'] /= int(day)
 		average[str(x) + 'close'] /= int(day)
 
-	# find min and max
+	# get min value / max value / arrays to be used for charting
 	lowvalVBM, lowtimeVBM, lowamountVBM, highvalVBM, hightimeVBM, highamountVBM, allvalsVBM = minmax(average, 'volatilityByMin')
 	lowvalVMO, lowtimeVMO, lowamountVMO, highvalVMO, hightimeVMO, highamountVMO, allvalsVMO = minmax(average, 'volatilityVsMktOpen')
 
@@ -110,23 +110,23 @@ def main():
 	print("<!DOCTYPE html>")
 	print("<html>")
 	print("<head>")
-	print("<script type='text/javascript'>")
-	print("window.onload = function () {")
-	createchart('Volatility by Minute', 'volByMin', allvalsVBM)
-	createchart('Volatility by Minute Vs. Market Open', 'volVsMktOpen', allvalsVMO)
-	print("}")
-	print("</script>")
-	print("<script type='text/javascript' src='http://canvasjs.com/assets/script/canvasjs.min.js'></script>")
-	print("<title>Intraday Stock Data: %s</title>" % (ticker))
+	print("		<script type='text/javascript'>")
+	print("		window.onload = function () {")
+	createLineGraph('Volatility by Minute', 'volByMin', allvalsVBM)
+	createLineGraph('Volatility by Minute Vs. Market Open', 'volVsMktOpen', allvalsVMO)
+	print("		}")
+	print("		</script>")
+	print("		<script type='text/javascript' src='http://canvasjs.com/assets/script/canvasjs.min.js'></script>")
+	print("		<title>Intraday Stock Data: %s</title>" % (ticker))
 	print("</head>")
 	print("<body>")
-	print("<h1>Intraday Stock Data: %s</h1>" % (ticker))
-	displaychart('volByMin')
-	print('<p>Highest: $%.2f @ +%.4f%% (%s)</p>' % (highamountVBM, highvalVBM, str(hightimeVBM.strftime("%I:%M%p")))) 
-	print('<p>Lowest: $%.2f @ %.4f%% (%s)</p>' % (lowamountVBM, lowvalVBM, str(lowtimeVBM.strftime("%I:%M%p"))))
-	displaychart('volVsMktOpen')
-	print('<p>Highest: $%.2f @ +%.4f%% (%s)</p>' % (highamountVMO, highvalVMO, str(hightimeVMO.strftime("%I:%M%p"))))
-	print('<p>Lowest: $%.2f @ %.4f%% (%s)</p>' % (lowamountVMO, lowvalVMO, str(lowtimeVMO.strftime("%I:%M%p"))))
+	print("		<h1>Intraday Stock Data: %s</h1>" % (ticker))
+	displayLineGraph('volByMin')
+	print('		<p>Highest: $%.2f @ +%.4f%% (%s)</p>' % (highamountVBM, highvalVBM, str(hightimeVBM.strftime("%I:%M%p")))) 
+	print('		<p>Lowest: $%.2f @ %.4f%% (%s)</p>' % (lowamountVBM, lowvalVBM, str(lowtimeVBM.strftime("%I:%M%p"))))
+	displayLineGraph('volVsMktOpen')
+	print('		<p>Highest: $%.2f @ +%.4f%% (%s)</p>' % (highamountVMO, highvalVMO, str(hightimeVMO.strftime("%I:%M%p"))))
+	print('		<p>Lowest: $%.2f @ %.4f%% (%s)</p>' % (lowamountVMO, lowvalVMO, str(lowtimeVMO.strftime("%I:%M%p"))))
 	print("</body>")
 	print("</html>")
 
