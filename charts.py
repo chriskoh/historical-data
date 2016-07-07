@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# chart.py
+# charts.py
 # library to create charts
 
 import cgi
@@ -25,7 +25,7 @@ def createLineGraph(lname, name, values):
 	print('		type: "line",')
 	print('		dataPoints: [')
 	for x in range(len(values)):
-		print('		{ x: new Date(2016,0,1,6,30+' + str(x) + ',0,0), y: ' + str(values[x]) + ' },')
+		print('		{ x: new Date(2016,0,1,6,30+' + str(x) + ',0,0), y: ' + str(values[x]) + ' },') # date does not matter, only time will be displayed
 	print('		]')
 	print('	}]')
 	print('});')
